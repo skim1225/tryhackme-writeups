@@ -96,7 +96,34 @@ Now, use the information you have already gathered to work out the username of t
 ```
 
 ## Understanding FTP
+```
+1. What communications model does FTP use?
+  a. client-server - FTP operates using a client-server protocol. The client initiates a connection with the server, the server validates whatever login credentials are provided and then opens the session.
+2. What's the standard FTP port?
+  a. 21
+3. How many modes of FTP connection are there?
+  a. 2 - Active, passive, or both.
+```
 
 ## Enumerating FTP
+```
+1. Run an nmap scan of your choice. How many ports are open on the target machine?
+  a. 2 - Used command 'nmap -sS -vv <target ip>'.
+2. What port is ftp running on?
+  a. 21 - Found using above command.
+3. What variant of FTP is running on it?
+  a. vsftpd - I needed more information so I ran another scan with the command 'nmap -A -p 21 <target ip>'.
+4. Great, now we know what type of FTP server we're dealing with we can check to see if we are able to login anonymously to the FTP server. We can do this using by typing "ftp [IP]" into the console, and entering "anonymous", and no password when prompted. What is the name of the file in the anonymous FTP directory?
+  a. PUBLIC_NOTICE.txt. Found by connecting to ftp server and using ls command.
+5. What do we think a possible username could be?
+  a. Mike - I downloaded the above file using the 'get' command, then opened the file to find the potential username.
+```
 
 ## Exploiting FTP
+```
+1. What is the password for the user "mike"?
+  a. password - Found using command 'hydra -t 4 -l mike -P /usr/share/wordlists/rockyou.txt -vV <target ip> ftp'.
+2. Bingo! Now, let's connect to the FTP server as this user using "ftp [IP]" and entering the credentials when prompted. What is ftp.txt?
+  a. THM{y0u_g0t_th3_ftp_fl4g}
+
+```
